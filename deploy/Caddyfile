@@ -1,0 +1,11 @@
+{$API_DOMAIN} {
+    handle /metrics* {
+        respond 404
+    }
+    handle /grafana* {
+        reverse_proxy grafana:3000
+    }
+    handle {
+        reverse_proxy api:8000
+    }
+}

@@ -1,0 +1,9 @@
+{
+  "files": [
+    {
+      "path": "calc.py",
+      "content": "def add(a: int, b: int) -> int:\n    if not isinstance(a, int) or not isinstance(b, int):\n        raise TypeError('add expects ints')\n    return a + b\n"
+    }
+  ],
+  "notes": ""
+}

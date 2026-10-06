@@ -1,0 +1,21 @@
+id: slugify
+prompt: >
+  Create slugify.py with slugify(text: str) -> str that lowercases, trims, drops punctuation,
+  and joins words with single hyphens. Raises TypeError if text is not a str.
+hidden_tests: |
+  import pytest
+  from slugify import slugify
+
+  @pytest.mark.parametrize("text,expected", [
+      ("Hello World", "hello-world"),
+      ("  Trim   me  ", "trim-me"),
+      ("Hello, World!", "hello-world"),
+      ("a--b", "a-b"),
+      ("", ""),
+  ])
+  def test_slugify(text, expected):
+      assert slugify(text) == expected
+
+  def test_type_error():
+      with pytest.raises(TypeError):
+          slugify(123)
