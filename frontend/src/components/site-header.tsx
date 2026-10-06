@@ -14,6 +14,9 @@ export async function SiteHeader() {
           Agent Forge
         </Link>
         <nav className="flex items-center gap-1">
+          <Link href="/documentation" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+            Documentation
+          </Link>
           {session?.user ? (
             <>
               <Link href="/new" className={buttonVariants({ variant: "ghost", size: "sm" })}>

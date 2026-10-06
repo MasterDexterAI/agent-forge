@@ -47,6 +47,8 @@ jobs:
 
   deploy:
     needs: build
+    # Opt in with a repository variable (Settings > Variables) once DEPLOY_HOST and DEPLOY_SSH_KEY exist.
+    if: ${{ vars.DEPLOY_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     environment: production
     steps:
