@@ -1,0 +1,13 @@
+{
+  "summary": "A module calc.py with add(a, b) returning the sum of two ints.",
+  "modules": ["calc.py"],
+  "interface": "def add(a: int, b: int) -> int. Raises TypeError if either argument is not an int.",
+  "subtasks": [
+    {
+      "id": 1,
+      "title": "Implement add",
+      "description": "Return a + b, reject non-int input.",
+      "acceptance_criteria": ["add(2, 3) == 5", "add('2', 3) raises TypeError"]
+    }
+  ]
+}

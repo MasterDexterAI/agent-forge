@@ -1,11 +1,14 @@
 import asyncio
 import sys
 import uuid
+
 from dotenv import load_dotenv
-from agentforge.core.graph import build_graph
+
 from agentforge.core.db import initialize_checkpointer
+from agentforge.core.graph import build_graph
 
 load_dotenv()
+
 
 async def run(prompt: str):
     checkpointer = await initialize_checkpointer()
@@ -33,6 +36,7 @@ async def run(prompt: str):
     config = {"configurable": {"thread_id": initial_state["task_id"]}}
     result = await graph.ainvoke(initial_state, config=config)
     print(result)
+
 
 if __name__ == "__main__":
     prompt = " ".join(sys.argv[1:])

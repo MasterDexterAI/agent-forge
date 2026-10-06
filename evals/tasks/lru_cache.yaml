@@ -1,0 +1,27 @@
+id: lru_cache
+prompt: >
+  Create lru.py with an LRUCache class. Constructor takes capacity (int > 0, else ValueError).
+  get(key) returns the value or None and marks the key recently used. put(key, value) inserts or
+  updates and evicts the least recently used key when over capacity. Operations are O(1).
+hidden_tests: |
+  import pytest
+  from lru import LRUCache
+
+  def test_basic():
+      c = LRUCache(2)
+      c.put("a", 1); c.put("b", 2)
+      assert c.get("a") == 1
+      c.put("c", 3)
+      assert c.get("b") is None
+      assert c.get("a") == 1 and c.get("c") == 3
+
+  def test_update_refreshes():
+      c = LRUCache(2)
+      c.put("a", 1); c.put("b", 2); c.put("a", 10); c.put("c", 3)
+      assert c.get("a") == 10
+      assert c.get("b") is None
+
+  @pytest.mark.parametrize("bad", [0, -1])
+  def test_bad_capacity(bad):
+      with pytest.raises(ValueError):
+          LRUCache(bad)

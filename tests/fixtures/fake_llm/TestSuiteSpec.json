@@ -1,0 +1,8 @@
+{
+  "files": [
+    {
+      "path": "tests/test_calc.py",
+      "content": "import pytest\nfrom calc import add\n\n\ndef test_add():\n    assert add(2, 3) == 5\n\n\ndef test_type_error():\n    with pytest.raises(TypeError):\n        add('2', 3)\n"
+    }
+  ]
+}

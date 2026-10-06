@@ -3,4 +3,7 @@ venv/
 __pycache__/
 *.pyc
 workspace/*
-!workspace/.gitkeep
+!workspace/.gitkeepfrontend/node_modules/
+frontend/.next/
+frontend/.env.local
+eval-report/

@@ -1,0 +1,71 @@
+name: release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/app.Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
+          cache-from: type=gha,scope=app
+          cache-to: type=gha,mode=max,scope=app
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/sandbox.Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ env.IMAGE }}-sandbox:${{ github.sha }}
+            ${{ env.IMAGE }}-sandbox:latest
+          cache-from: type=gha,scope=sandbox
+          cache-to: type=gha,mode=max,scope=sandbox
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ubuntu
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            cd /srv/agentforge/app
+            git fetch origin main && git reset --hard ${{ github.sha }}
+            IMAGE=$(grep '^IMAGE=' .env | cut -d= -f2)
+            docker pull "$IMAGE-sandbox:${{ github.sha }}"
+            docker tag "$IMAGE-sandbox:${{ github.sha }}" agentforge-sandbox:latest
+            export TAG=${{ github.sha }}
+            docker compose -f compose.prod.yml pull api worker
+            docker compose -f compose.prod.yml run --rm api python -m agentforge.store.migrate
+            docker compose -f compose.prod.yml up -d --remove-orphans
+            sleep 10
+            curl -fsS "https://$(grep '^API_DOMAIN=' .env | cut -d= -f2)/readyz"
+            docker image prune -f
